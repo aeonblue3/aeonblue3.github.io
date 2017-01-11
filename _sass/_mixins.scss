@@ -1,0 +1,179 @@
+@charset "UTF-8";
+
+// Imports
+@import "settings";
+
+/**
+ * Make an element a container with a max-width
+ */
+@mixin container() {
+  *zoom: 1;
+  max-width: $container-width;
+  width: 100%;
+  _width: $container-width;
+  margin-left: auto;
+  margin-right: auto;
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+/**
+ * Make an element a container that spans the width of the containing element.
+ */
+@mixin full_width_container() {
+  *zoom: 1;
+  width: 100%;
+  _width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+  &:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+}
+
+/**
+ * Make a container with a custom max-width
+ */
+@mixin custom_container($width) {
+  $current-width: $container-width;
+  $container-width: $width;
+  @include container();
+  $container-width: $current-width;
+}
+
+/**
+ * Create an element that spans a number of columns
+ *
+ * @param $size  Should be given as a fraction. Ex: 3/8 means to span three
+ *               columns out of eight.
+ * @param [$add-gutter]  Optionally adds a gutter
+ */
+@mixin column($size, $add-gutter: true) {
+  box-sizing: $root-box-sizing;
+  float: left;
+  margin-bottom: 0;
+  width: ($size * 100%);
+
+  @if $add-gutter {
+    padding-left: ($default-gutter / 2);
+    padding-right: ($default-gutter / 2);
+  }
+}
+
+/**
+ * Alias to column mixin. For when pluralizing makes sense.
+ */
+@mixin columns($size, $add-gutter: true) {
+  @include column($size, $add-gutter);
+}
+
+/**
+ * Create media query for a desktop region
+ */
+@mixin desktop() {
+  @media screen and (min-width: $tablet-size){
+    $current-total: $default-columns;
+    $current-container-width: $container-width;
+    $current-gutter: $gutter-width;
+
+    $default-columns: $mobile-columns;
+    $container-width: $container-width;
+    $gutter-width: $default-gutter;
+
+    @content;
+
+    $default-columns: $current-total;
+    $container-width: $current-container-width;
+    $gutter-width: $current-gutter;
+  }
+}
+
+/**
+ * Create media query for a tablet region
+ */
+@mixin tablet($size: max) {
+  @media screen and (#{$size}-width: $tablet-size){
+    $current-total: $default-columns;
+    $current-container-width: $container-width;
+    $current-gutter: $gutter-width;
+
+
+    $default-columns: $tablet-columns;
+    $container-width: $tablet-size;
+    $gutter-width: $tablet-gutter;
+
+    @content;
+
+    $default-columns: $current-total;
+    $container-width: $current-container-width;
+    $gutter-width: $current-gutter;
+  }
+}
+
+/**
+ * Create media query for a mobile region
+ */
+@mixin mobile($size: max) {
+  @if $size != max {$mobile-size: $mobile-size;}
+  @media screen and (#{$size}-width: $mobile-size){
+    $current-total: $default-columns;
+    $current-container-width: $container-width;
+    $current-gutter: $gutter-width;
+
+    $default-columns: $mobile-columns;
+    $container-width: $mobile-size;
+    $gutter-width: $mobile-gutter;
+
+    @content;
+
+    $default-columns: $current-total;
+    $container-width: $current-container-width;
+    $gutter-width: $current-gutter;
+  }
+}
+
+/**
+ * Create media query for a screen with a certain pixel ratio
+ *
+ * @param $pixel  pixel ratio
+ */
+@mixin pixel_density($pixel: 2) {
+  @media screen and (min-resolution: #{$pixel}dppx){
+    @content;
+  }
+}
+
+/**
+ * Create a custom media query
+ *
+ * @param $value  Where to create the breakpoint
+ */
+@mixin breakpoint($value, $min: false) {
+  $condition: "max";
+  @if $min == true {
+    $condition: "min";
+  }
+  @media screen and (#{$condition}-width: $value) {
+    @content;
+  }
+}
+
+/**
+ * Change font sizes at breakpoints
+ *
+ * @param 
+ */
+@mixin responsive_font_size($size, $tablet-size: 90%, $mobile-size: 70%) {
+  font-size: $size;
+  @include tablet {
+    font-size: $tablet-size;
+  }
+  @include mobile {
+    font-size: $mobile-size;
+  }
+}
